@@ -10,7 +10,7 @@ const HeroSection = () => {
         {/* LEFT CONTENT */}
         <div className="md:w-1/2 flex flex-col justify-center">
 
-          {/* Location chip (desktop only) */}
+          {/* Location chip (desktop only)
           <div className="hidden md:block mt-4">
             <div className="bg-surface border border-[#E3E8E6] flex items-center rounded-2xl pl-4 py-2 pr-6 w-fit">
               <img
@@ -22,7 +22,7 @@ const HeroSection = () => {
                 bangalore
               </span>
             </div>
-          </div>
+          </div> */}
 
           {/* Heading */}
           <h1 className="md:text-3xl text-2xl leading-[1.5] font-black md:w-3/5 mt-6 uppercase text-[#3b4540]">
