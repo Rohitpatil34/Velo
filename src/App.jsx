@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar/Navbar";
@@ -21,23 +22,62 @@ import MobileTopNav from "./components/Navbar/MobileTopNav";
 import MobileBottomNav from "./components/Navbar/MobileBottomNav";
 import TrainPage from "./Pages/TrainPage";
 import BookPage from "./Pages/BookPage"
+import LoginSignupModal from "./components/Auth/LoginSignupModal";
+import VerifyEmail from "./Pages/VerifyEmail";
+import ProfilePage from "./Pages/ProfilePage";
+import Myprofile from "./components/Profile/MyBookings";
+import FeedBack from "./components/Profile/FeedBack";
+import EditProfile from "./components/Profile/EditProfile";
+import MyBookings from "./components/Profile/MyBookings";
+
 
 const App = () => {
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+
   return (
-     <BrowserRouter>
+    <BrowserRouter>
+
+      {/* 🔹 LOGIN / SIGNUP MODAL (GLOBAL) */}
+      <LoginSignupModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+      />
+
       <Routes>
-        {/* ✅ Default / Home page */}
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={<HomePage onLoginClick={() => setIsAuthOpen(true)} />}
+        />
 
-        {/* Play page */}
-        <Route path="/play" element={<PlayPage />} />
+        <Route
+          path="/play"
+          element={<PlayPage onLoginClick={() => setIsAuthOpen(true)} />}
+        />
 
-        {/* Train page */}
-        <Route path="/train" element={<TrainPage/>} />
+        <Route
+          path="/train"
+          element={<TrainPage onLoginClick={() => setIsAuthOpen(true)} />}
+        />
 
-        {/* Book page */}
-        <Route path="/book" element={<BookPage/>}/>
+        <Route
+          path="/book"
+          element={<BookPage onLoginClick={() => setIsAuthOpen(true)} />}
+        />
+        <Route
+          path="/verify-email"
+          element={<VerifyEmail />}
+        />
+        <Route path="/profile" element={<ProfilePage />} >
+         <Route index element={<Myprofile />} />
+          <Route path="myprofile" element={<MyBookings />} />
+          <Route path="feedback" element={<FeedBack />} />
+          <Route path="editprofile" element={<EditProfile />} />
+        </Route>
+
+
       </Routes>
+
     </BrowserRouter>
   );
 };
