@@ -3,29 +3,100 @@ import VeloLogo from "../../assets/Velo.png";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-
-
+import { useLocation } from "../../context/LocationContext";
 
 const DesktopNavbar = ({ onLoginClick }) => {
-    const { user, logout } = useAuth()
-    const navigate = useNavigate(); // ✅ ADD
-    const [openMenu, setOpenMenu] = useState(false);
-    const menuRef = useRef(null);
 
+    const { user, logout } = useAuth();
+    const { location, setLocation } = useLocation();
+    const navigate = useNavigate();
+
+    const [openMenu, setOpenMenu] = useState(false);
+    const [openLocation, setOpenLocation] = useState(false);
+    const [query, setQuery] = useState("");
+    const [results, setResults] = useState([]);
+
+    const menuRef = useRef(null);
+    const locationRef = useRef(null);
     // Close dropdown on outside click
+    /* ================= CLOSE DROPDOWNS ================= */
     useEffect(() => {
-        const handleClickOutside = (e) => {
+        const handler = (e) => {
             if (menuRef.current && !menuRef.current.contains(e.target)) {
                 setOpenMenu(false);
             }
+            if (locationRef.current && !locationRef.current.contains(e.target)) {
+                setOpenLocation(false);
+            }
         };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
     }, []);
+
+    /* ================= CITY SEARCH ================= */
+    useEffect(() => {
+        if (query.length < 2) {
+            setResults([]);
+            return;
+        }
+
+        const timer = setTimeout(async () => {
+            try {
+                const res = await fetch(
+                    `http://localhost:5000/api/location/search?q=${query}`
+                );
+                const data = await res.json();
+                setResults(data);
+            } catch (err) {
+                console.error("City search failed", err);
+            }
+        }, 400);
+
+        return () => clearTimeout(timer);
+    }, [query]);
+
+    /* ================= DETECT LOCATION ================= */
+    const detectLocation = () => {
+        if (!navigator.geolocation) {
+            alert("Geolocation not supported");
+            return;
+        }
+
+        setLocation((prev) => ({ ...prev, loading: true }));
+
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                try {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+
+                    const res = await fetch(
+                        `http://localhost:5000/api/location/reverse?lat=${lat}&lng=${lng}`
+                    );
+                    const data = await res.json();
+
+                    setLocation({
+                        lat,
+                        lng,
+                        city: data.city,
+                        area: data.area,
+                        loading: false,
+                    });
+
+                    setOpenLocation(false);
+                } catch (err) {
+                    console.error("Reverse geocode failed", err);
+                }
+            },
+            () => alert("Location permission denied")
+        );
+    };
+
     return (
         <header className="bg-white hidden md:block sticky top-0 z-10">
             <nav className="flex justify-between items-center mx-12 xxl:m-auto py-4 max-w-page">
+
+                {/* ================= LEFT ================= */}
                 <div className="flex items-center xl:min-w-[400px] w-1/3">
 
                     {/* LOGO */}
@@ -36,30 +107,98 @@ const DesktopNavbar = ({ onLoginClick }) => {
                             width="96"
                             height="24"
                             className="py-2 min-w-[98px]"
-                            loading="lazy"
                         />
                     </NavLink>
 
                     {/* LOCATION SELECTOR */}
-                    <div className="ml-4 cursor-pointer">
-                        <div className="bg-surface border border-[#e3e8e6] flex items-center rounded-2xl pl-4 py-2 pr-6 relative w-fit">
+                    <div className="ml-4 relative" ref={locationRef}>
+                        <div className="bg-surface border border-[#e3e8e6] flex items-center rounded-2xl pl-4 py-2 pr-6 w-fit">
                             <button
-                                aria-label="location"
-                                className="flex flex-row items-center overflow-hidden outline-none md:h-6 xl:w-60"
-                                type="button"
+                                onClick={() => setOpenLocation((v) => !v)}
+                                className="flex items-center gap-2 outline-none"
                             >
                                 <img
                                     src="https://playo-website.gumlet.io/playo-website-v3/icons/location_icon.png"
-                                    alt="Location"
                                     className="w-5 h-5"
+                                    alt="Location"
                                 />
-                                <span className="ml-2 capitalize truncate max-w-[170px] font-medium leading-6">
-                                    Kasaba-Bawada
+                                <span className="capitalize truncate max-w-[170px] font-medium leading-6">
+                                    {location.loading
+                                        ? "Detecting location..."
+                                        : location.area || location.city || "Select Location"}
                                 </span>
                             </button>
                         </div>
-                    </div>
 
+                        {/* LOCATION DROPDOWN */}
+                        {openLocation && (
+                            <div className="absolute z-30 mt-3 w-[320px] bg-white border rounded-xl shadow-lg p-3">
+
+                                {/* SEARCH INPUT */}
+                                <div className="relative">
+                                    <input
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter" && results.length > 0) {
+                                                const place = results[0];
+                                                setLocation({
+                                                    lat: Number(place.lat),
+                                                    lng: Number(place.lng),
+                                                    city: place.city,
+                                                    area: place.area,
+                                                    loading: false,
+                                                });
+                                                setOpenLocation(false);
+                                                setResults([]);
+                                                setQuery("");
+                                            }
+                                        }}
+
+                                        value={query}
+                                        onChange={(e) => setQuery(e.target.value)}
+                                        placeholder="Select for cities, places ..."
+                                        className="w-full h-12 px-12 border rounded-md focus:outline-none"
+                                    />
+
+                                    {/* SEARCH ICON */}
+                                    <img
+                                        src="https://playo-website.gumlet.io/playo-website-v2/logos-icons/search-icon-dark.svg"
+                                        className="w-5 h-5 absolute left-3 top-3"
+                                    />
+
+                                    {/* DETECT ICON */}
+                                    <img
+                                        onClick={detectLocation}
+                                        src="https://playo-website.gumlet.io/playo-website-v2/logos-icons/detect-location-icon.svg"
+                                        className="w-5 h-5 absolute right-3 top-3 cursor-pointer"
+                                    />
+                                </div>
+
+                                {/* RESULTS */}
+                                <div className="mt-2 max-h-60 overflow-auto">
+                                    {results.map((place, i) => (
+                                        <div
+                                            key={i}
+                                            onClick={() => {
+                                                setLocation({
+                                                    lat: Number(place.lat),
+                                                    lng: Number(place.lng),
+                                                    city: place.city,
+                                                    area: place.area,
+                                                    loading: false,
+                                                });
+                                                setResults([]);
+                                                setQuery("");
+                                                setOpenLocation(false);
+                                            }}
+                                            className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                        >
+                                            {place.display}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
 
