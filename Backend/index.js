@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import process from "process";
 import otproutes from "./routes/otproutes.js"
-
+import locationRoutes from "./routes/locationRoutes.js"
 import userRoutes from "./routes/userroutes.js";
 import gameRoutes from "./routes/gameroutes.js"
 import connectDB from "./Config/db.js";
@@ -23,6 +23,8 @@ app.use(cors());
 app.use("/api/users", userRoutes);
 app.use("/api/otp", otproutes);
 app.use("/api/games", gameRoutes);
+app.use("/api/location", locationRoutes);
+app.use("/api/location", locationRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
