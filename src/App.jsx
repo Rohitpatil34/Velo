@@ -29,6 +29,7 @@ import Myprofile from "./components/Profile/MyBookings";
 import FeedBack from "./components/Profile/FeedBack";
 import EditProfile from "./components/Profile/EditProfile";
 import MyBookings from "./components/Profile/MyBookings";
+import JoinPagePlay from "./Pages/JoinPagePlay";
 
 
 const App = () => {
@@ -53,7 +54,9 @@ const App = () => {
         <Route
           path="/play"
           element={<PlayPage onLoginClick={() => setIsAuthOpen(true)} />}
+          
         />
+        <Route path="/play/:playId" element={<JoinPagePlay />} />
 
         <Route
           path="/train"
