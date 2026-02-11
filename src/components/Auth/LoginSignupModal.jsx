@@ -10,18 +10,21 @@ const LoginSignupModal = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [agree, setAgree] = useState(false);
+  const [mobile, setMobile] = useState("");
+
 
   // auth states
   const [mode, setMode] = useState("login"); // login | signup
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const {login} = useAuth();
-    // ✅ RESET MODAL STATE WHEN IT OPENS
+  const { login } = useAuth();
+  // ✅ RESET MODAL STATE WHEN IT OPENS
   useEffect(() => {
     if (isOpen) {
       setEmail("");
       setPassword("");
+      setMobile("");
       setAgree(false);
       setMode("login");
       setError("");
@@ -33,6 +36,15 @@ const LoginSignupModal = ({ isOpen, onClose }) => {
   const handleSubmit = async () => {
     setError("");
     setSuccess("");
+    if (mode === "signup") {
+      const mobileRegex = /^[6-9]\d{9}$/;
+
+      if (!mobileRegex.test(mobile)) {
+        setError("Enter valid 10 digit mobile number");
+        return;
+      }
+    }
+
 
     if (!email || !password) {
       setError("Email and password are required");
@@ -51,7 +63,7 @@ const LoginSignupModal = ({ isOpen, onClose }) => {
         await api.post("/users/signup", {
           name: email.split("@")[0], // temporary
           email,
-          mobile: "9999999999", // temporary
+          mobile, // temporary
           password,
         });
 
@@ -63,7 +75,7 @@ const LoginSignupModal = ({ isOpen, onClose }) => {
           email,
           password,
         });
-       login(res.data.token,res.data.user)
+        login(res.data.token, res.data.user)
         setSuccess("Login successful!");
         onClose();
       }
@@ -86,7 +98,7 @@ const LoginSignupModal = ({ isOpen, onClose }) => {
 
       <div className="flex min-h-screen md:items-center md:justify-center">
         <Dialog.Panel className="w-full h-screen md:h-auto md:w-6/12 max-w-5xl bg-white rounded-none md:rounded-xl shadow-xl flex flex-col md:flex-row overflow-hidden">
-          
+
           {/* LEFT IMAGE */}
           <div className="hidden lg:flex w-1/2 relative bg-green-500">
             <img
@@ -103,7 +115,7 @@ const LoginSignupModal = ({ isOpen, onClose }) => {
 
           {/* RIGHT CONTENT */}
           <div className="w-full h-full bg-white lg:w-1/2 px-6 sm:px-8 py-8 relative">
-            
+
             {/* Header */}
             <div className="flex items-center justify-between border-b pb-6 text-xl font-semibold">
               <span>Login / Sign Up</span>
@@ -134,7 +146,7 @@ const LoginSignupModal = ({ isOpen, onClose }) => {
 
             {/* Form */}
             <div className="mt-8 space-y-6">
-              
+
               {/* Email */}
               <div>
                 <label className="block mb-2 text-md font-medium text-gray-500">
@@ -148,6 +160,21 @@ const LoginSignupModal = ({ isOpen, onClose }) => {
                   className="border rounded-lg px-4 h-12 w-full outline-none"
                 />
               </div>
+              {mode === "signup" && (
+                <div>
+                  <label className="block mb-2 text-md font-medium text-gray-500">
+                    Mobile Number *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter mobile number"
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value)}
+                    className="border rounded-lg px-4 h-12 w-full outline-none"
+                  />
+                </div>
+              )}
+
 
               {/* Password */}
               <div>
