@@ -30,6 +30,7 @@ import FeedBack from "./components/Profile/FeedBack";
 import EditProfile from "./components/Profile/EditProfile";
 import MyBookings from "./components/Profile/MyBookings";
 import JoinPagePlay from "./Pages/JoinPagePlay";
+import TrainerProfilePage from "./Pages/TrainerProfilePage";
 
 
 const App = () => {
@@ -54,7 +55,7 @@ const App = () => {
         <Route
           path="/play"
           element={<PlayPage onLoginClick={() => setIsAuthOpen(true)} />}
-          
+
         />
         <Route path="/play/:playId" element={<JoinPagePlay />} />
 
@@ -62,6 +63,11 @@ const App = () => {
           path="/train"
           element={<TrainPage onLoginClick={() => setIsAuthOpen(true)} />}
         />
+        <Route
+          path="/trainer/details/:id"
+          element={<TrainerProfilePage />}
+        />
+
 
         <Route
           path="/book"
@@ -72,7 +78,7 @@ const App = () => {
           element={<VerifyEmail />}
         />
         <Route path="/profile" element={<ProfilePage />} >
-         <Route index element={<Myprofile />} />
+          <Route index element={<Myprofile />} />
           <Route path="myprofile" element={<MyBookings />} />
           <Route path="feedback" element={<FeedBack />} />
           <Route path="editprofile" element={<EditProfile />} />
