@@ -7,6 +7,7 @@ import locationRoutes from "./routes/locationRoutes.js"
 import userRoutes from "./routes/userroutes.js";
 import gameRoutes from "./routes/gameroutes.js"
 import connectDB from "./Config/db.js";
+import trainerRoutes from "./routes/trainerRoutes.js";
 
 dotenv.config();
 
@@ -25,6 +26,8 @@ app.use("/api/otp", otproutes);
 app.use("/api/games", gameRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/location", locationRoutes);
+app.use("/api/trainers", trainerRoutes);
+
 
 // Test Route
 app.get("/", (req, res) => {
