@@ -1,62 +1,112 @@
 import React from "react";
 import { MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const GamesCard = () => {
+const GamesCard = ({ game }) => {
+  const navigate = useNavigate();
+
+  if (!game) return null;
+
+  /* ================= CALCULATIONS ================= */
+
+  const going = game.totalSlots - game.availableSlots;
+
+  const dateObj = new Date(game.date);
+  const formattedDate = dateObj.toLocaleDateString("en-IN", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+  const distanceKm =
+    game.distance != null ? (game.distance / 1000).toFixed(2) : null;
+
+  /* ================= CLICK HANDLER ================= */
+
+  const handleClick = () => {
+    navigate(`/play/${game._id}`);
+  };
+
+  /* ================= RENDER ================= */
+
   return (
-    <div className="bg-white border border-[#E3E8E6] rounded-[16px] p-4 shadow-[0_4px_12px_rgba(0,0,0,0.08)] max-w-[340px] w-full flex flex-col gap-3 cursor-pointer">
-
-      {/* Top Tags */}
-      <div className="flex items-center gap-1 text-xs font-medium text-mute_text">
-        <span className="capitalize">Doubles</span>
-        <span className="w-1 h-1 rounded-full bg-gray-400" />
-        <span className="capitalize">Regular</span>
-      </div>
-
-      {/* Players + Going */}
-      <div className="flex items-center gap-3">
-        <div className="flex -space-x-3">
-          <img
-            src="https://playov2.gumlet.io/profiles/1765881344118-1765881343.881257.jpg?q=30"
-            className="w-9 h-9 rounded-full border-2 border-white object-cover"
-          />
-          <img
-            src="https://playov2.gumlet.io/profiles/1765976318167-file_17659763151782378410881573306310.png?q=30"
-            className="w-9 h-9 rounded-full border-2 border-white object-cover"
-          />
-        </div>
-
-        <span className="text-sm font-semibold text-gray-900">
-          7 Going
+    <div
+      onClick={handleClick}
+      className="flex overflow-hidden relative h-[250px] flex-col space-y-2 p-4 shadow-card border mb-6 rounded-[16px] border-[#E3E8E6] cursor-pointer bg-white w-full md:min-w-[320px] hover:shadow-lg transition"
+    >
+      {/* ================= TOP TAGS ================= */}
+      <div className="flex items-center text-xs font-medium text-mute_text">
+        <span className="capitalize">{game.sport}</span>
+        <span className="mx-1">•</span>
+        <span className="capitalize">
+          {game.bookingType?.replaceAll("_", " ")}
         </span>
       </div>
 
-      {/* Host + Karma */}
-      <div className="text-xs font-medium text-mute_text">
-        Srinivas <span className="mx-1">|</span> 553 Karma
+      {/* ================= GOING + PRICE ================= */}
+      <div className="flex justify-between items-center">
+        <div className="font-bold text-sm">
+          {going}
+          <span className="text-xs font-medium">
+            /{game.totalSlots}
+          </span>{" "}
+          Going
+        </div>
+
+        {game.price > 0 && (
+          <div className="bg-surface rounded-lg px-2 py-1 text-sm font-semibold">
+            ₹ {game.price}
+          </div>
+        )}
       </div>
 
-      {/* Date & Time */}
-      <div className="text-sm font-semibold text-gray-900">
-        Wed, 21 Jan 2026, 06:30 AM - 08:00 PM
+      {/* ================= HOST ================= */}
+      <div className="text-xs text-mute_text font-medium">
+        {game.createdBy?.name || "Host"}
       </div>
 
-      {/* Location */}
-      <div className="flex items-center gap-2 text-xs text-mute_text">
-        <MapPin size={16} />
-        <span>Sportfit - JP Nagar ~8.86 Kms</span>
+      {/* ================= DATE & TIME ================= */}
+      <div className="text-sm font-semibold text-on_background">
+        {formattedDate}, {game.startTime} - {game.endTime}
       </div>
 
-      {/* Level Chip */}
-      <div className="flex items-center gap-2 mt-1">
-        <img
-          src="https://playo.gumlet.io/V3SPORTICONS/SP5.png"
-          className="w-5 h-5"
-        />
-        <div className="bg-[#F1F3F2] rounded-lg px-3 py-1 text-xs font-medium text-gray-700 truncate">
-          Beginner - Professional
+      {/* ================= LOCATION ================= */}
+      <div className="flex items-center gap-2 text-xs text-on_background mt-1">
+        <MapPin size={14} />
+        <span className="truncate">
+          {game.location?.name}
+          {distanceKm && ` ~${distanceKm} km`}
+        </span>
+      </div>
+
+      {/* ================= PARTICIPANT AVATARS ================= */}
+      {game.participants?.length > 0 && (
+        <div className="flex items-center mt-1">
+          {game.participants.slice(0, 2).map((p, index) => (
+            <div
+              key={index}
+              className="h-8 w-8 rounded-full overflow-hidden border-2 border-white mr-[-10px]"
+            >
+              <img
+                src={
+                  p.user?.avatar ||
+                  "https://playo-website.gumlet.io/playo-website-v3/icons/Avatar-man-specs.png?q=30"
+                }
+                alt="participant"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ================= SKILL LEVEL ================= */}
+      <div className="flex items-center mt-auto">
+        <div className="bg-[#F1F3F2] rounded-lg px-3 py-1 text-xs font-medium capitalize">
+          {game.skillLevel}
         </div>
       </div>
-
     </div>
   );
 };
