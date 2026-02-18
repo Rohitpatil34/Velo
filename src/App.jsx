@@ -31,6 +31,7 @@ import EditProfile from "./components/Profile/EditProfile";
 import MyBookings from "./components/Profile/MyBookings";
 import JoinPagePlay from "./Pages/JoinPagePlay";
 import TrainerProfilePage from "./Pages/TrainerProfilePage";
+import TrainerCategoryPage from "./components/Train Page/TrainerCategoryPage";
 
 
 const App = () => {
@@ -62,6 +63,10 @@ const App = () => {
         <Route
           path="/train"
           element={<TrainPage onLoginClick={() => setIsAuthOpen(true)} />}
+        />
+        <Route
+          path="/trainer/categories/:sport"
+          element={<TrainerCategoryPage />}
         />
         <Route
           path="/trainer/details/:id"
