@@ -40,7 +40,10 @@ export const getGames = async (req, res) => {
 
     /* ================= BASIC FILTERS ================= */
     if (city) filters["location.city"] = city
-    if (sport) filters.sport = sport
+    if (sport) {
+      if (Array.isArray(sport)) filters.sport = { $in: sport }
+      else filters.sport = sport
+    }
     if (time) filters.timeCategory = time
     if (skill) filters.skillLevel = skill
     if (bookingType) filters.bookingType = bookingType
