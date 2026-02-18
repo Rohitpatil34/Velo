@@ -12,6 +12,7 @@ export const getTrainers = async (req, res) => {
       age,
       batch,
       type,
+      search,   // ✅ added
       page = 1,
       limit = 9,
     } = req.query;
@@ -19,10 +20,19 @@ export const getTrainers = async (req, res) => {
     const userId = req.user?.id || null;
 
     const filters = {};
+
     if (sport) filters.services = { $in: sport.split(",") };
     if (age) filters.ageGroups = { $in: age.split(",") };
     if (batch) filters.batchTypes = { $in: batch.split(",") };
     if (type) filters.type = type;
+
+    /* SEARCH FILTER */
+    if (search) {
+      filters.name = {
+        $regex: search,
+        $options: "i",
+      };
+    }
 
     const skip = (Number(page) - 1) * Number(limit);
 
@@ -79,6 +89,7 @@ export const getTrainers = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 /* ================= GET SINGLE TRAINER ================= */
 export const getTrainerById = async (req, res) => {
