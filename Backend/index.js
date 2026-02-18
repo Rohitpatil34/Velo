@@ -8,6 +8,7 @@ import userRoutes from "./routes/userroutes.js";
 import gameRoutes from "./routes/gameroutes.js"
 import connectDB from "./Config/db.js";
 import trainerRoutes from "./routes/trainerRoutes.js";
+import venueRoutes from "./routes/venueRoutes.js";
 
 dotenv.config();
 
@@ -25,12 +26,12 @@ app.use("/api/users", userRoutes);
 app.use("/api/otp", otproutes);
 app.use("/api/games", gameRoutes);
 app.use("/api/location", locationRoutes);
-app.use("/api/location", locationRoutes);
 app.use("/api/trainers", trainerRoutes);
+app.use("/api/venues",venueRoutes)
 
 
 // Test Route
-app.get("/", (req, res) => {
+app.get("/health", (req, res) => {
   res.send("API is running & DB connected");
 });
 
