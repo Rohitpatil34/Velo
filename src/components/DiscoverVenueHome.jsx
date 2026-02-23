@@ -1,13 +1,19 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { fetchVenues } from "../services/venueApi";
+import { useLocation } from "../context/LocationContext";
 import VenueCard from "./VenueCard";
 
 const DiscoverVenueHome = () => {
   const scrollRef = useRef(null);
+  const { location } = useLocation();
+  const navigate = useNavigate();
+  const [venues, setVenues] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const scroll = (direction) => {
     if (!scrollRef.current) return;
 
-    // Venue card min width (~316) + spacing
     const scrollAmount = 360;
 
     scrollRef.current.scrollBy({
@@ -16,16 +22,44 @@ const DiscoverVenueHome = () => {
     });
   };
 
+  useEffect(() => {
+    if (!location.lat || !location.lng) return;
+
+    const loadVenues = async () => {
+      try {
+        setLoading(true);
+
+        const data = await fetchVenues({
+          lat: location.lat,
+          lng: location.lng,
+          page: 1,
+          limit: 10,
+        });
+
+        setVenues(data.venues);
+      } catch (error) {
+        console.error("Error fetching venues:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadVenues();
+  }, [location.lat, location.lng]);
+
   return (
     <section className="mt-8">
 
       {/* Header */}
       <div className="flex justify-between font-bold md:px-12 px-4">
-        <h2 className="md:leading-9 md:text-2xl text-xl">
-          Book Venues
+        <h2 className="md:text-2xl text-xl">
+          Book Venues in {location.city || "Your City"}
         </h2>
 
-        <button className="text-primary flex items-center gap-2 font-bold leading-6">
+        <button
+          onClick={() => navigate("/book")}
+          className="text-primary flex items-center gap-2 font-bold"
+        >
           SEE ALL VENUES
           <img
             src="https://playo-website.gumlet.io/playo-website-v3/icons/right_arrow_green.png"
@@ -39,37 +73,22 @@ const DiscoverVenueHome = () => {
       {/* Scroll Area */}
       <div className="flex mt-6">
         <div className="relative overflow-hidden w-full">
-
-          {/* Actual scroll container */}
           <div
             ref={scrollRef}
             className="flex overflow-x-auto no-scrollbar whitespace-nowrap"
           >
-            {/* Card wrappers (spacing same as Playo) */}
-            <div className="first:ml-4 ml-4 mb-6 md:first:ml-12 md:ml-6">
-              <VenueCard />
-            </div>
-
-            <div className="ml-4 mb-6 md:ml-6">
-              <VenueCard />
-            </div>
-
-            <div className="ml-4 mb-6 md:ml-6">
-              <VenueCard />
-            </div>
-
-            <div className="ml-4 mb-6 md:ml-6">
-              <VenueCard />
-            </div>
-
-            <div className="ml-4 mb-6 md:ml-6 last:mr-4 md:last:mr-12">
-              <VenueCard />
-            </div>
-            
-            <div className="ml-4 mb-6 md:ml-6 last:mr-4 md:last:mr-12">
-              <VenueCard />
-            </div>
-            {/* Add more VenueCard → scroll activates automatically */}
+            {loading ? (
+              <div className="ml-6 text-gray-500">Loading venues...</div>
+            ) : (
+              venues.map((venue) => (
+                <div
+                  key={venue._id}
+                  className="ml-4 mb-6 md:ml-6"
+                >
+                  <VenueCard venue={venue} />
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
