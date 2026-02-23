@@ -78,6 +78,11 @@ const App = () => {
           path="/book"
           element={<BookPage onLoginClick={() => setIsAuthOpen(true)} />}
         />
+
+        <Route
+          path="/book/:venueId"
+          element={<BookPage onLoginClick={() => setIsAuthOpen(true)} />}
+        />
         <Route
           path="/verify-email"
           element={<VerifyEmail />}
