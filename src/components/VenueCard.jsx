@@ -1,18 +1,45 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const VenueCard = ({
-  image="https://playo.gumlet.io/TIENTO/tientosports6.jpg?mode=crop&crop=smart&h=200&width=450&q=40&format=webp",
-  name = "RSA Ravi's Turf",
-  rating = "2.18",
-  reviews = 17,
-  address = "15, Cambridge Road, Ne...",
-  distance = "3.73 Kms",
-  featured = true,
-}) => {
+const VenueCard = ({ venue }) => {
+  const navigate = useNavigate();
+
+  if (!venue) return null;
+
+  // 🔹 Extract Data Safely
+  const image =
+    venue.images && venue.images.length > 0
+      ? venue.images[0]
+      : "https://via.placeholder.com/450";
+
+  const name = venue.name;
+
+  const rating = venue.rating
+    ? venue.rating.toFixed(1)
+    : "0.0";
+
+  const reviews = venue.totalReviews || 0; 
+  // (If you don’t store reviews yet, this will default to 0)
+
+  const address =
+    venue.area
+      ? `${venue.area}, ${venue.city}`
+      : venue.city;
+
+  const distance =
+    venue.distance
+      ? (venue.distance / 1000).toFixed(2) + " km"
+      : null;
+
+  const featured = venue.rating >= 4; 
+  // Example logic: rating 4+ = featured
+
   return (
-    <div className="w-full max-w-[340px] cursor-pointer rounded-[16px] border border-[#E3E8E6] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
+    <div
+      onClick={() => navigate(`/book/${venue._id}`)}
+      className="w-full max-w-[340px] cursor-pointer rounded-[16px] border border-[#E3E8E6] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:shadow-lg transition"
+    >
 
-      {/* 🔹 Inner Padding Wrapper */}
       <div className="p-3 flex flex-col gap-3">
 
         {/* 🔹 Image */}
@@ -23,7 +50,6 @@ const VenueCard = ({
             className="h-full w-full object-cover rounded-[12px]"
           />
 
-          {/* FEATURED Badge */}
           {featured && (
             <div className="absolute bottom-3 right-3 rounded-full bg-[#111827] px-[10px] py-[6px] text-[11px] font-semibold tracking-wide text-white">
               FEATURED
@@ -45,9 +71,10 @@ const VenueCard = ({
           </div>
         </div>
 
-        {/* 🔹 Address */}
+        {/* 🔹 Address + Distance */}
         <div className="truncate text-[13px] font-medium text-[#6B7280]">
-          {address} (~{distance})
+          {address}
+          {distance && ` (~${distance})`}
         </div>
 
       </div>
