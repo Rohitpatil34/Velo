@@ -6,6 +6,7 @@ import MobileTopNav from "../components/Navbar/MobileTopNav";
 import PlayWrapper from "../components/PlayPages/PlayWrapper";
 import SportsComplexHome from "../components/SportsComplexHome";
 import MobileBottomNav from "../components/Navbar/MobileBottomNav";
+import axios from "axios";
 
 const JoinPagePlay = () => {
   const { playId } = useParams();
@@ -21,8 +22,8 @@ const JoinPagePlay = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(
-        `http://localhost:5000/api/games/${playId}`,
+      const res = await axios.get(
+        `/games/${playId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -34,8 +35,8 @@ const JoinPagePlay = () => {
         throw new Error("Failed to fetch game");
       }
 
-      const data = await res.json();
-      setGame(data);
+
+      setGame(res.data);
     } catch (err) {
       console.error("Failed to fetch game:", err);
       setGame(null);
@@ -53,15 +54,13 @@ const JoinPagePlay = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(
-        `http://localhost:5000/api/games/${playId}/join`,
+      const res = await axios.post(
+        `/games/${playId}/join`,
+        { message },
         {
-          method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ message }),
         }
       );
 
@@ -82,16 +81,14 @@ const JoinPagePlay = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(
-        `http://localhost:5000/api/games/${playId}/leave`,
+      const res = await axios.delete(
+        `/games/${playId}/leave`,
         {
-          method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
       if (!res.ok) {
         const error = await res.json();
         alert(error.message || "Leave failed");

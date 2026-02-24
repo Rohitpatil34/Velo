@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import GamesCard from "../GamesCard";
 import { useLocation } from "../../context/LocationContext";
 
@@ -8,50 +9,61 @@ const CardsPlayPage = ({ filters }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-
     if (!location.lat || !location.lng) return;
 
     const fetchGames = async () => {
       try {
         setLoading(true);
 
-        // BASE URL
-        let url = `http://localhost:5000/api/games?lat=${location.lat}&lng=${location.lng}`;
+        
+        // Build params object instead of manual URL string
+        const params = {
+          lat: location.lat,
+          lng: location.lng,
+        };
 
-        // APPLY FILTERS
-        if (filters?.sort === "distance") url += "&sortBy=distance";
+        if (filters?.sort === "distance") {
+          params.sortBy = "distance";
+        }
 
-        if (filters?.time?.length)
-          url += `&time=${filters.time[0]}`;
+        if (filters?.time?.length) {
+          params.time = filters.time[0];
+        }
 
         if (filters?.sport?.length) {
-          filters.sport.forEach(s => {
-            url += `&sport=${s}`;
-          });
+          params.sport = filters.sport; // axios supports arrays
         }
-        if (filters?.date)
-          url += `&date=${filters.date}`;
 
+        if (filters?.date) {
+          params.date = filters.date;
+        }
 
-        if (filters?.skill?.length)
-          url += `&skill=${filters.skill[0]}`;
+        if (filters?.skill?.length) {
+          params.skill = filters.skill[0];
+        }
 
-        if (filters?.others?.includes("Pay & Join"))
-          url += "&bookingType=pay_and_join";
+        if (filters?.others?.includes("Pay & Join")) {
+          params.bookingType = "pay_and_join";
+        }
 
-        const res = await fetch(url);
-        const data = await res.json();
+        const { data } = await axios.get(
+          `/games`,
+          { params }
+        );
+
         setGames(data.games || []);
       } catch (err) {
-        console.error("Failed to fetch games", err);
+        console.error(
+          "Failed to fetch games",
+          err.response?.data || err.message
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchGames();
-
-  }, [location.lat, location.lng, filters]);   // IMPORTANT
+  }, [location.lat, location.lng, filters]);
 
   if (loading) {
     return (

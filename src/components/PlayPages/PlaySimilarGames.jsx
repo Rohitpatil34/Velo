@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,11 +17,12 @@ const PlaySimilarGames = ({ game }) => {
         const lat = game.location.geo.coordinates[1];
         const lng = game.location.geo.coordinates[0];
 
-        const res = await fetch(
-          `http://localhost:5000/api/games?lat=${lat}&lng=${lng}&distance=10`
+        const { data } = await axios.get(
+          `/games`,
+          {
+            params: { lat, lng, distance: 10 },
+          }
         );
-
-        const data = await res.json();
 
         // Remove current game
         const filtered = data.games.filter(

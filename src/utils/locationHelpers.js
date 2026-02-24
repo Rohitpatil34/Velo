@@ -1,5 +1,7 @@
 // src/utils/locationHelpers.js
 
+import axios from "axios";
+
 export const detectCurrentLocation = async (setLocation) => {
   if (!navigator.geolocation) {
     alert("Geolocation not supported");
@@ -15,10 +17,12 @@ export const detectCurrentLocation = async (setLocation) => {
 
       try {
         // ⚠️ Use backend proxy (NO CORS issue)
-        const res = await fetch(
-          `http://localhost:5000/api/location/reverse?lat=${lat}&lng=${lng}`
+        const { data } = await axios.get(
+          "/location/reverse",
+          {
+            params: { lat, lng }
+          }
         );
-        const data = await res.json();
 
         setLocation({
           lat,

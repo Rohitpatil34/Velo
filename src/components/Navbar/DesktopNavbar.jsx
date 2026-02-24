@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useLocation } from "../../context/LocationContext";
+import axios from "axios";
 
 const DesktopNavbar = ({ onLoginClick }) => {
 
@@ -42,10 +43,10 @@ const DesktopNavbar = ({ onLoginClick }) => {
 
         const timer = setTimeout(async () => {
             try {
-                const res = await fetch(
-                    `http://localhost:5000/api/location/search?q=${query}`
+                const { data } = await axios.get(
+                    "/location/search",
+                    { params: { q: query } }
                 );
-                const data = await res.json();
                 setResults(data);
             } catch (err) {
                 console.error("City search failed", err);
@@ -70,10 +71,10 @@ const DesktopNavbar = ({ onLoginClick }) => {
                     const lat = pos.coords.latitude;
                     const lng = pos.coords.longitude;
 
-                    const res = await fetch(
-                        `http://localhost:5000/api/location/reverse?lat=${lat}&lng=${lng}`
+                    const { data } = await axios.get(
+                        "/location/search",
+                        { params: { q: query } }
                     );
-                    const data = await res.json();
 
                     setLocation({
                         lat,
