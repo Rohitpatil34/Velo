@@ -1,60 +1,147 @@
-import React from "react";
+import React, { useState } from "react";
+import FilterModal from "./FilterModal";
+import DateDropdown from "./DateDropdown";
 
-const FiltersPlayPage = () => {
+const FiltersPlayPage = ({ filters = {}, setFilters }) => {
+
+  /* SAFETY DEFAULTS */
+  const safeFilters = {
+    sport: [],
+    date: null,
+    sort: null,
+    time: [],
+    skill: [],
+    others: [],
+    ...filters
+  };
+
+  const [open, setOpen] = useState(false);
+  const [sportsOpen, setSportsOpen] = useState(false);
+  const [dateOpen, setDateOpen] = useState(false);
+
+  const sportsList = [
+    "cricket",
+    "football",
+    "tennis",
+    "badminton",
+    "basketball"
+  ];
+
   return (
-    <div className="mt-6 w-full flex gap-2 px-4 md:mx-2 overflow-auto no-scrollbar">
-      
-      {/* GameTime Toggle */}
-      <div className="flex gap-4 border border-[#E3E8E6] bg-white py-3 px-4 rounded-2xl cursor-pointer min-w-fit">
-        <img
-          src="https://playo-website.gumlet.io/playo-website-v3/icons/activity/gameTime_logo.png"
-          width="24"
-          height="24"
-          alt="Gametime activities"
-          className="h-6 w-6"
-        />
-        <span className="font-medium">GameTime by Playo</span>
-        <div className="flex items-center justify-center">
-          <button className="border-main relative inline-flex items-center bg-white border-2 h-4 w-6 rounded-full transition-colors focus:outline-none">
-            <span className="translate-x-[2px] bg-white border-2 border-main inline-block h-2 w-2 transform rounded-full transition-transform"></span>
+    <>
+      <div className="mt-6 w-full flex gap-2 px-4 md:mx-2 overflow-visible no-scrollbar">
+
+        {/* GameTime Toggle */}
+        {/* <div className="flex gap-4 border border-[#E3E8E6] bg-white py-3 px-4 rounded-2xl cursor-pointer min-w-fit">
+          <img
+            src="https://playo-website.gumlet.io/playo-website-v3/icons/activity/gameTime_logo.png"
+            className="h-6 w-6"
+          />
+          <span className="font-medium">GameTime by Playo</span>
+        </div> */}
+
+        {/* Filter & Sort */}
+        <div
+          onClick={() => setOpen(true)}
+          className="flex justify-center items-center gap-4 border border-[#E3E8E6] bg-white py-3 px-4 rounded-2xl cursor-pointer min-w-fit"
+        >
+          <span className="font-medium">Filter & Sort By</span>
+        </div>
+
+        {/* SPORTS */}
+        <div className="relative">
+          <button onClick={() => setSportsOpen(!sportsOpen)}>
+            <div className="flex justify-center items-center py-3 px-4 rounded-2xl border bg-white min-w-fit">
+              <span className="font-medium">Sports</span>
+            </div>
           </button>
+
+          {sportsOpen && (
+            <div className="absolute mt-2 w-52 bg-white border rounded-xl shadow-lg z-50 p-2">
+              {sportsList.map((sport) => (
+                <label
+                  key={sport}
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 capitalize"
+                >
+                  <input
+                    type="checkbox"
+                    checked={(safeFilters.sport || []).includes(sport)}
+                    onChange={() => {
+                      const updated =
+                        safeFilters.sport.includes(sport)
+                          ? safeFilters.sport.filter((s) => s !== sport)
+                          : [...safeFilters.sport, sport];
+
+                      setFilters(prev => ({
+                        ...prev,
+                        sport: updated
+                      }));
+                    }}
+                  />
+                  {sport}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* DATE */}
+        <div className="relative">
+          <button onClick={() => setDateOpen(!dateOpen)}>
+            <div className="flex justify-center items-center py-3 px-4 rounded-2xl border bg-white">
+              <span className="font-medium">
+                {safeFilters.date ? new Date(safeFilters.date).toLocaleDateString() : "Date"}
+              </span>
+
+            </div>
+          </button>
+          
+
+          {dateOpen && (
+            <div className="absolute mt-2 z-50">
+              <DateDropdown
+                onSelect={(date) => {
+                  setFilters(prev => ({
+                    ...prev,
+                    date
+                  }));
+                  setDateOpen(false);
+                }}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Pay & Join */}
+        {/* <div className="flex justify-center items-center py-3 px-4 rounded-2xl border bg-white">
+          <span className="font-medium">Pay & Join Game</span>
+        </div> */}
       </div>
 
-      {/* Filter & Sort */}
-      <div className="flex justify-center items-center gap-4 border border-[#E3E8E6] bg-white py-3 px-4 rounded-2xl cursor-pointer min-w-fit">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M0 2V7.33333H7.33333V0H2C1.46957 0 0.960859 0.210714 0.585786 0.585786C0.210714 0.960859 0 1.46957 0 2ZM6 6H1.33333V2C1.33333 1.82319 1.40357 1.65362 1.5286 1.5286C1.65362 1.40357 1.82319 1.33333 2 1.33333H6V6Z" fill="#3B4540"/>
-          <path d="M0 14C0 14.5304 0.210714 15.0392 0.585786 15.4142C0.960859 15.7893 1.46957 16 2 16H7.33333V8.66669H0V14Z" fill="#3B4540"/>
-        </svg>
-        <span className="font-medium">Filter & Sort By</span>
-        <div className="w-6 h-6 flex items-center justify-center">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M15.0572 3.95264L8.47124 10.5386C8.34449 10.6603 8.1756 10.7282 7.99991 10.7282C7.82421 10.7282 7.65533 10.6603 7.52857 10.5386L0.946573 3.95597L0.00390625 4.89864L6.58591 11.4813C6.96714 11.8447 7.47359 12.0473 8.00024 12.0473C8.52689 12.0473 9.03334 11.8447 9.41457 11.4813L15.9999 4.8953L15.0572 3.95264Z" fill="#3B4540"/>
-          </svg>
+      {/* MODAL */}
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black opacity-80"
+            onClick={() => setOpen(false)}
+          ></div>
+
+          <div className="relative z-10">
+            <FilterModal
+              initialFilters={safeFilters}
+              onClose={() => setOpen(false)}
+              onApply={(modalFilters) => {
+                setFilters(prev => ({
+                  ...prev,
+                  ...modalFilters
+                }));
+                setOpen(false);
+              }}
+            />
+          </div>
         </div>
-      </div>
-
-      {/* Sports */}
-      <button className="outline-none">
-        <div className="flex justify-center items-center gap-4 py-3 px-4 rounded-2xl cursor-pointer border border-[#E3E8E6] bg-white min-w-fit">
-          <span className="font-medium">Sports</span>
-        </div>
-      </button>
-
-      {/* Date */}
-      <button>
-        <div className="flex justify-center items-center gap-4 py-3 px-4 rounded-2xl cursor-pointer border border-[#E3E8E6] bg-white min-w-fit">
-          <span className="font-medium">Date</span>
-        </div>
-      </button>
-
-      {/* Pay & Join */}
-      <div className="flex justify-center items-center gap-4 py-3 px-4 rounded-2xl cursor-pointer border border-[#E3E8E6] bg-white min-w-fit">
-        <span className="font-medium">Pay & Join Game</span>
-      </div>
-
-    </div>
+      )}
+    </>
   );
 };
 
