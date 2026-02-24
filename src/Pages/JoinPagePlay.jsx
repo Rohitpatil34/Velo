@@ -6,7 +6,7 @@ import MobileTopNav from "../components/Navbar/MobileTopNav";
 import PlayWrapper from "../components/PlayPages/PlayWrapper";
 import SportsComplexHome from "../components/SportsComplexHome";
 import MobileBottomNav from "../components/Navbar/MobileBottomNav";
-import axios from "axios";
+import api from "../services/api";
 
 const JoinPagePlay = () => {
   const { playId } = useParams();
@@ -22,7 +22,7 @@ const JoinPagePlay = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await axios.get(
+      const res = await api.get(
         `/games/${playId}`,
         {
           headers: {
@@ -54,7 +54,7 @@ const JoinPagePlay = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await axios.post(
+      const res = await api.post(
         `/games/${playId}/join`,
         { message },
         {
@@ -81,7 +81,7 @@ const JoinPagePlay = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await axios.delete(
+      const res = await api.delete(
         `/games/${playId}/leave`,
         {
           headers: {

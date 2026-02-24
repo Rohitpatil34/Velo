@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import GamesCard from "../GamesCard";
 import { useLocation } from "../../context/LocationContext";
 
@@ -31,7 +30,7 @@ const CardsPlayPage = ({ filters }) => {
         }
 
         if (filters?.sport?.length) {
-          params.sport = filters.sport; // axios supports arrays
+          params.sport = filters.sport; // api supports arrays
         }
 
         if (filters?.date) {
@@ -46,7 +45,7 @@ const CardsPlayPage = ({ filters }) => {
           params.bookingType = "pay_and_join";
         }
 
-        const { data } = await axios.get(
+        const { data } = await api.get(
           `/games`,
           { params }
         );

@@ -1,6 +1,6 @@
-import axios from "axios";
 import React, { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 
 const PlaySimilarGames = ({ game }) => {
   const scrollRef = useRef(null);
@@ -17,7 +17,7 @@ const PlaySimilarGames = ({ game }) => {
         const lat = game.location.geo.coordinates[1];
         const lng = game.location.geo.coordinates[0];
 
-        const { data } = await axios.get(
+        const { data } = await api.get(
           `/games`,
           {
             params: { lat, lng, distance: 10 },

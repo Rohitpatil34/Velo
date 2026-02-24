@@ -1,7 +1,5 @@
-import axios from "axios";
+import api from "./api";
 
-const BASE_URL = `${import.meta.env.VITE_SERVER_API}/api`; 
-// change 5000 if your backend runs on different port
 
 export const fetchVenues = async ({
   lat,
@@ -11,7 +9,7 @@ export const fetchVenues = async ({
   limit = 9,
 }) => {
   try {
-    const response = await axios.get(`${BASE_URL}/venues`, {
+    const response = await api.get(`/venues`, {
       params: {
         lat,
         lng,
@@ -29,7 +27,7 @@ export const fetchVenues = async ({
 };
 export const fetchVenueById = async (id) => {
   try {
-    const response = await axios.get(`${BASE_URL}/venues/${id}`);
+    const response = await api.get(`/venues/${id}`);
     return response.data;
   } catch (error) {
     console.error("Fetch venue by ID error:", error);

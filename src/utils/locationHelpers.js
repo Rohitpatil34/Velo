@@ -1,6 +1,8 @@
 // src/utils/locationHelpers.js
 
-import axios from "axios";
+import api from "../services/api";
+
+
 
 export const detectCurrentLocation = async (setLocation) => {
   if (!navigator.geolocation) {
@@ -17,7 +19,7 @@ export const detectCurrentLocation = async (setLocation) => {
 
       try {
         // ⚠️ Use backend proxy (NO CORS issue)
-        const { data } = await axios.get(
+        const { data } = await api.get(
           "/location/reverse",
           {
             params: { lat, lng }

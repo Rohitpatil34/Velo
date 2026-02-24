@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import VeloLogo from "../../assets/Velo.png";
 import { NavLink } from "react-router-dom";
 import { useLocation } from "../../context/LocationContext";
-import axios from "axios";
+import api from "../../services/api";
 
 const MobileTopNav = () => {
   const { location, setLocation } = useLocation();
@@ -34,7 +34,7 @@ const MobileTopNav = () => {
 
     const timer = setTimeout(async () => {
       try {
-        const { data } = await axios.get(
+        const { data } = await api.get(
           "/location/search",
           { params: { q: query } }
         );
@@ -62,7 +62,7 @@ const MobileTopNav = () => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
 
-          const { data } = await axios.get(
+          const { data } = await api.get(
             "/location/search",
             { params: { q: query } }
           );
