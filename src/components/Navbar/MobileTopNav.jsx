@@ -34,10 +34,10 @@ const MobileTopNav = () => {
 
     const timer = setTimeout(async () => {
       try {
-        const { data } = await api.get(
-          "/location/search",
-          { params: { q: query } }
+        const res = await api(
+          `/location/search?q=${query}`
         );
+        const data =  res.data;
         setResults(data);
       } catch (err) {
         console.error("Location search failed", err);
@@ -62,10 +62,10 @@ const MobileTopNav = () => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
 
-          const { data } = await api.get(
-            "/location/search",
-            { params: { q: query } }
+          const res = await api(
+            `/location/reverse?lat=${lat}&lng=${lng}`
           );
+          const data =  res.data;
 
           setLocation({
             lat,

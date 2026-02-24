@@ -35,6 +35,7 @@ const DiscoverVenueHome = () => {
           page: 1,
           limit: 10,
         });
+console.log(data);
 
         setVenues(data.venues);
       } catch (error) {
