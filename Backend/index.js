@@ -6,7 +6,7 @@ import otproutes from "./routes/otproutes.js"
 import locationRoutes from "./routes/locationRoutes.js"
 import userRoutes from "./routes/userroutes.js";
 import gameRoutes from "./routes/gameroutes.js"
-import connectDB from "./Config/db.js";
+import connectDB from "./config/db.js";
 import trainerRoutes from "./routes/trainerRoutes.js";
 import venueRoutes from "./routes/venueRoutes.js";
 
