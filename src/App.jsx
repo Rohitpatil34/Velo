@@ -32,6 +32,7 @@ import MyBookings from "./components/Profile/MyBookings";
 import JoinPagePlay from "./Pages/JoinPagePlay";
 import TrainerProfilePage from "./Pages/TrainerProfilePage";
 import TrainerCategoryPage from "./components/Train Page/TrainerCategoryPage";
+import BookingCheckoutPage from "./Pages/BookingCheckoutPage";
 
 
 const App = () => {
@@ -82,6 +83,10 @@ const App = () => {
         <Route
           path="/book/:venueId"
           element={<BookPage onLoginClick={() => setIsAuthOpen(true)} />}
+        />
+        <Route
+          path="/book/:venueId/checkout"
+          element={<BookingCheckoutPage />}
         />
         <Route
           path="/verify-email"
