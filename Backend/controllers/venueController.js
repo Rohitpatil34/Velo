@@ -183,7 +183,7 @@ export const getAvailableSlots = async (req, res) => {
     const bookings = await Booking.find({
       venue: venueId,
       date,
-      status: "confirmed",
+      status: { $in: ["confirmed", "pending"] },
     });
 
     const slots = [];
