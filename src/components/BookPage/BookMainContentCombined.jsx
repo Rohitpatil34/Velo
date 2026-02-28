@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchVenueById } from "../../services/venueApi";
-
+import BookBooking from "./BookBooking"
 import BookMainContentImage from "./BookMainContentImage";
 import BookMainContentHeader from "./BookMainContentHeader";
 import BookMainContentSide from "./BookMainContentSide";
@@ -47,6 +47,7 @@ const BookMainContentCombined = () => {
       <div className="grid w-full grid-cols-1 gap-4 mt-6 md:grid-cols-3 md:gap-x-5">
         <BookMainContentImage venue={venue} />
         <BookMainContentSide venue={venue} />
+        
       </div>
 
       <div className="grid w-full grid-cols-1 gap-4 mt-0 md:grid-cols-3 md:gap-x-5">
