@@ -21,31 +21,32 @@ export const generateSlots = (
       start.getTime() + slotDuration * 60000
     );
 
-    /* Count how many courts are booked for this slot */
-    let bookedCourts = 0;
+    const courts = [];
 
-    existingBookings.forEach((booking) => {
-      const bookingStart = new Date(
-        `${selectedDate}T${booking.startTime}:00`
-      );
-      const bookingEnd = new Date(
-        `${selectedDate}T${booking.endTime}:00`
-      );
+    for (let i = 1; i <= totalCourts; i++) {
+      const isBooked = existingBookings.some((booking) => {
+        if (booking.courtNumber !== i) return false;
 
-      const overlap =
-        slotStart < bookingEnd &&
-        slotEnd > bookingStart;
+        const bookingStart = new Date(
+          `${booking.date}T${booking.startTime}:00`
+        );
+        const bookingEnd = new Date(
+          `${booking.date}T${booking.endTime}:00`
+        );
 
-      if (overlap) {
-        bookedCourts++;
-      }
-    });
+        return slotStart < bookingEnd && slotEnd > bookingStart;
+      });
+
+      courts.push({
+        courtNumber: i,
+        isAvailable: !isBooked,
+      });
+    }
 
     slots.push({
       startTime: slotStart.toTimeString().slice(0, 5),
       endTime: slotEnd.toTimeString().slice(0, 5),
-      availableCourts: totalCourts - bookedCourts,
-      isAvailable: bookedCourts < totalCourts,
+      courts,
     });
 
     start.setMinutes(start.getMinutes() + slotDuration);
