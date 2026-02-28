@@ -39,6 +39,22 @@ const bookingSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
+        paymentId: {
+            type: String,
+        },
+
+        orderId: {
+            type: String,
+        },
+
+        paymentStatus: {
+            type: String,
+            enum: ["pending", "paid", "failed"],
+            default: "pending",
+        },
+        lockExpiresAt: {
+            type: Date,
+        },
 
         status: {
             type: String,
@@ -49,8 +65,15 @@ const bookingSchema = new mongoose.Schema(
 
         amount: Number,
     },
+
     { timestamps: true }
+
 );
 bookingSchema.index({ venue: 1, date: 1 });
 bookingSchema.index({ venue: 1, date: 1, startTime: 1 });
+bookingSchema.index({ lockExpiresAt: 1 }, { expireAfterSeconds: 0 });
+bookingSchema.index(
+    { venue: 1, date: 1, courtNumber: 1, startTime: 1 },
+    { unique: true }
+);
 export default mongoose.model("Booking", bookingSchema);
