@@ -1,10 +1,4 @@
-// services/slotService.js
-
-export const generateSlots = (
-  venue,
-  selectedDate,
-  existingBookings
-) => {
+export const generateSlots = (venue, selectedDate, existingBookings) => {
   const slots = [];
 
   const openTime = venue.operatingHours.open;
@@ -17,9 +11,7 @@ export const generateSlots = (
 
   while (start < end) {
     const slotStart = new Date(start);
-    const slotEnd = new Date(
-      start.getTime() + slotDuration * 60000
-    );
+    const slotEnd = new Date(start.getTime() + slotDuration * 60000);
 
     const courts = [];
 
@@ -27,12 +19,8 @@ export const generateSlots = (
       const isBooked = existingBookings.some((booking) => {
         if (booking.courtNumber !== i) return false;
 
-        const bookingStart = new Date(
-          `${booking.date}T${booking.startTime}:00`
-        );
-        const bookingEnd = new Date(
-          `${booking.date}T${booking.endTime}:00`
-        );
+        const bookingStart = new Date(`${booking.date}T${booking.startTime}:00`);
+        const bookingEnd = new Date(`${booking.date}T${booking.endTime}:00`);
 
         return slotStart < bookingEnd && slotEnd > bookingStart;
       });
@@ -46,6 +34,7 @@ export const generateSlots = (
     slots.push({
       startTime: slotStart.toTimeString().slice(0, 5),
       endTime: slotEnd.toTimeString().slice(0, 5),
+      isAvailable: courts.some((court) => court.isAvailable), // ✅ IMPORTANT
       courts,
     });
 
