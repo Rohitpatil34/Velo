@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 // ─── Icon helpers (inline SVG to avoid extra deps) ──────────────────────────
 const SportIcon = () => (
@@ -70,6 +71,7 @@ const NativeSelect = ({ icon, value, onChange, disabled, children, className = "
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const BookBooking = ({ venue }) => {
+  const navigate = useNavigate();
   const [sport, setSport] = useState("");
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -79,6 +81,9 @@ const BookBooking = ({ venue }) => {
   const [loadingPayment, setLoadingPayment] = useState(false);
   const [selectedCourt, setSelectedCourt] = useState("");
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [isBooked, setIsBooked] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     if (venue?.sports?.length > 0) setSport(venue.sports[0]);
@@ -192,6 +197,21 @@ const BookBooking = ({ venue }) => {
         order_id: data.orderId,
         handler: function () {
           alert("Payment successful 🎉");
+
+          const details = {
+            venueName: venue.name,
+            sport,
+            date,
+            startTime,
+            endTime: calculateEndTime(),
+            courtNumber: selectedCourt,
+            amount: totalCost,
+            status: "Confirmed",
+            orderId: data.orderId,
+          };
+
+          setBookingDetails(details);
+          setIsBooked(true);
         },
         theme: { color: "#16a34a" },
       };
@@ -259,15 +279,30 @@ const BookBooking = ({ venue }) => {
                 <NativeSelect
                   icon={<ClockIcon />}
                   value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
+                  onChange={(e) => {
+                    const time = e.target.value;
+                    setStartTime(time);
+
+                    const slotObj = slots.find(
+                      (s) => s.startTime === time
+                    );
+
+                    setSelectedSlot(slotObj || null);
+                    setSelectedCourt(""); // reset court
+                  }}
                   disabled={!date || loadingSlots}
                 >
-                  <option value="">{loadingSlots ? "Loading..." : "Select Time"}</option>
-                  {slots.filter((s) => s.isAvailable).map((slot) => (
-                    <option key={slot.startTime} value={slot.startTime}>
-                      {formatStartTimeDisplay(slot.startTime)}
-                    </option>
-                  ))}
+                  <option value="">
+                    {loadingSlots ? "Loading..." : "Select Time"}
+                  </option>
+
+                  {slots
+                    .filter((s) => s.isAvailable)
+                    .map((slot) => (
+                      <option key={slot.startTime} value={slot.startTime}>
+                        {formatStartTimeDisplay(slot.startTime)}
+                      </option>
+                    ))}
                 </NativeSelect>
               </Row>
 
@@ -291,7 +326,6 @@ const BookBooking = ({ venue }) => {
                   </button>
                 </div>
               </Row>
-              {/* Court Selection */}
               {selectedSlot && (
                 <Row label="Court">
                   <div className="flex flex-wrap gap-3">
@@ -369,6 +403,32 @@ const BookBooking = ({ venue }) => {
               >
                 {loadingPayment ? "Processing..." : `Proceed INR ${totalCost.toFixed(2)}`}
               </button>
+              {isBooked && (
+                <div className="mt-4">
+                  <button
+                    onClick={() => setShowDetails(!showDetails)}
+                    className="w-full py-2 text-sm font-semibold text-green-700 border border-green-600 rounded-lg hover:bg-green-50 transition"
+                  >
+                    {showDetails ? "Hide Details" : "View Details"}
+                  </button>
+                  {showDetails && bookingDetails && (
+                    <div className="mt-4 p-4 border rounded-xl bg-gray-50 text-sm space-y-2">
+                      <p><strong>Venue:</strong> {bookingDetails.venueName}</p>
+                      <p><strong>Sport:</strong> {bookingDetails.sport}</p>
+                      <p><strong>Date:</strong> {formatDateDisplay(bookingDetails.date)}</p>
+                      <p>
+                        <strong>Time:</strong>{" "}
+                        {formatStartTimeDisplay(bookingDetails.startTime)} -{" "}
+                        {formatEndTimeDisplay()}
+                      </p>
+                      <p><strong>Court:</strong> {bookingDetails.courtNumber}</p>
+                      <p><strong>Amount:</strong> INR {bookingDetails.amount}</p>
+                      <p><strong>Status:</strong> {bookingDetails.status}</p>
+                      <p><strong>Order ID:</strong> {bookingDetails.orderId}</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -376,20 +436,32 @@ const BookBooking = ({ venue }) => {
 
       {/* ── MOBILE STICKY BAR ── */}
       <div className="fixed bottom-0 left-0 w-full border-t bg-white md:hidden px-5 py-3.5 flex justify-between items-center shadow-lg z-50">
+
+        {/* LEFT SIDE - VIEW BUTTON */}
+        <button
+          onClick={() => navigate("/profile/myprofile")}
+          className="px-5 py-2.5 rounded-full font-semibold text-sm border border-green-600 text-green-600 hover:bg-green-50 transition"
+        >
+          View
+        </button>
+
+        {/* RIGHT SIDE - PROCEED */}
         <div>
           <p className="text-xs text-gray-400">Total Cost</p>
           <p className="font-bold text-gray-900">INR {totalCost}</p>
         </div>
+
         <button
           onClick={handlePayment}
           disabled={!canProceed || loadingPayment}
           className={`px-6 py-2.5 rounded-full font-semibold text-sm ${canProceed && !loadingPayment
-            ? "bg-green-600 text-white hover:bg-green-700"
-            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              ? "bg-green-600 text-white hover:bg-green-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
         >
           {loadingPayment ? "Processing..." : "Proceed"}
         </button>
+
       </div>
     </main>
   );
