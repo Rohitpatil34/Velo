@@ -1,5 +1,6 @@
 import Venue from "../model/VenueModel.js";
 import Booking from "../model/BookingModel.js";
+import { generateSlots } from "../services/slotService.js";
 
 
 /* =======================================================
@@ -167,6 +168,7 @@ export const getVenueById = async (req, res) => {
 //     res.status(500).json({ message: "Server error" });
 //   }
 // };
+
 export const getAvailableSlots = async (req, res) => {
   try {
     const { venueId, date } = req.query;
@@ -186,35 +188,8 @@ export const getAvailableSlots = async (req, res) => {
       status: { $in: ["confirmed", "pending"] },
     });
 
-    const slots = [];
-
-    const open = new Date(`${date}T${venue.operatingHours.open}:00`);
-    const close = new Date(`${date}T${venue.operatingHours.close}:00`);
-
-    while (open < close) {
-      const slotStart = new Date(open);
-      const slotEnd = new Date(
-        open.getTime() + venue.slotDuration * 60000
-      );
-
-      const overlappingBookings = bookings.filter((b) => {
-        const bookingStart = new Date(`${b.date}T${b.startTime}:00`);
-        const bookingEnd = new Date(`${b.date}T${b.endTime}:00`);
-
-        return bookingStart < slotEnd && bookingEnd > slotStart;
-      });
-
-      slots.push({
-        startTime: slotStart.toTimeString().slice(0, 5),
-        endTime: slotEnd.toTimeString().slice(0, 5),
-        availableCourts:
-          venue.totalCourts - overlappingBookings.length,
-        isAvailable:
-          overlappingBookings.length < venue.totalCourts,
-      });
-
-      open.setMinutes(open.getMinutes() + venue.slotDuration);
-    }
+    // 🔥 USE SLOT SERVICE HERE
+    const slots = generateSlots(venue, date, bookings);
 
     res.status(200).json({ slots });
 
