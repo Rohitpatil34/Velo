@@ -7,9 +7,10 @@ import {
   cancelBooking,
   getVenueBookings,
   getAvailableSlots,
+  getBookingById,
 } from "../controllers/bookingController.js";
 
-import protect from "../middleware/authMiddleware.js";
+import protect from "../middlewares/authmiddleware.js";
 
 const router = express.Router();
 
@@ -27,5 +28,7 @@ router.put("/:id/cancel", protect, cancelBooking);
 
 /* Get bookings of a venue (admin use) */
 router.get("/venue/:venueId", protect, getVenueBookings);
+
+router.get("/:id", protect, getBookingById);
 
 export default router;
