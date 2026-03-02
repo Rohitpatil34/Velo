@@ -10,6 +10,7 @@ import gameRoutes from "./routes/gameroutes.js";
 import trainerRoutes from "./routes/trainerRoutes.js";
 import venueRoutes from "./routes/venueRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
 
 import { verifyPaymentWebhook } from "./controllers/paymentController.js";
 
@@ -45,6 +46,7 @@ app.use("/api/location", locationRoutes);
 app.use("/api/trainers", trainerRoutes);
 app.use("/api/venues", venueRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/bookings",bookingRoutes)
 
 // Health check
 app.get("/health", (req, res) => {
