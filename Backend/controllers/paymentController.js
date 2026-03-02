@@ -14,7 +14,7 @@ export const createPaymentOrder = async (req, res) => {
   try {
     session.startTransaction();
 
-    const { venueId, sport, date, startTime, endTime } = req.body;
+    const { venueId, sport, date, startTime, endTime, courtNumber } = req.body;
     const userId = req.user.id;
 
     if (!venueId || !sport || !date || !startTime || !endTime) {
@@ -83,24 +83,24 @@ export const createPaymentOrder = async (req, res) => {
 
       return newStart < existingEnd && newEnd > existingStart;
     });
-
-    /* 3️⃣ Allocate Court */
-    const bookedCourts = conflictingBookings.map((b) => b.courtNumber);
-
-    let assignedCourt = null;
-
-    for (let i = 1; i <= venue.totalCourts; i++) {
-      if (!bookedCourts.includes(i)) {
-        assignedCourt = i;
-        break;
-      }
-    }
-
-    if (!assignedCourt) {
+    /* 3️⃣ Validate Selected Court */
+    if (!courtNumber) {
       await session.abortTransaction();
       session.endSession();
       return res.status(400).json({
-        message: "All courts fully booked",
+        message: "Court selection is required",
+      });
+    }
+
+    const isCourtBooked = conflictingBookings.some(
+      (b) => b.courtNumber === Number(courtNumber)
+    );
+
+    if (isCourtBooked) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({
+        message: "Selected court is already booked",
       });
     }
 
@@ -129,7 +129,7 @@ export const createPaymentOrder = async (req, res) => {
             date,
             startTime,
             endTime,
-            courtNumber: assignedCourt,
+            courtNumber: Number(courtNumber),
             amount,
             status: "pending",
             paymentStatus: "pending",
