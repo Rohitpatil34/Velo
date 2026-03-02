@@ -12,7 +12,7 @@ export const createBooking = async (req, res) => {
   try {
     session.startTransaction();
 
-    const { venueId, sport, date, startTime, endTime } = req.body;
+    const { venueId, sport, date, startTime, endTime, courtNumber } = req.body;
     const userId = req.user.id;
 
     if (!venueId || !sport || !date || !startTime || !endTime) {
@@ -30,7 +30,17 @@ export const createBooking = async (req, res) => {
         message: "This sport is not available at this venue",
       });
     }
+    if (!courtNumber) {
+      return res.status(400).json({
+        message: "Court selection is required",
+      });
+    }
 
+    if (courtNumber < 1 || courtNumber > venue.totalCourts) {
+      return res.status(400).json({
+        message: "Invalid court selected",
+      });
+    }
     /* ================= VALIDATE DATE ================= */
     const today = new Date();
     const bookingDate = new Date(date);
@@ -112,21 +122,13 @@ export const createBooking = async (req, res) => {
       },
     }).session(session);
 
-    /* ================= COURT AUTO ALLOCATION ================= */
-    const bookedCourts = overlappingBookings.map((b) => b.courtNumber);
+    const isCourtBooked = overlappingBookings.some(
+      (b) => b.courtNumber === courtNumber
+    );
 
-    let assignedCourt = null;
-
-    for (let i = 1; i <= venue.totalCourts; i++) {
-      if (!bookedCourts.includes(i)) {
-        assignedCourt = i;
-        break;
-      }
-    }
-
-    if (!assignedCourt) {
+    if (isCourtBooked) {
       return res.status(400).json({
-        message: "All courts are fully booked for this slot",
+        message: "This court is already booked for selected time",
       });
     }
 
@@ -150,7 +152,7 @@ export const createBooking = async (req, res) => {
           date,
           startTime,
           endTime,
-          courtNumber: assignedCourt,
+          courtNumber: courtNumber,
           amount,
           status: "confirmed",
         },
@@ -184,11 +186,24 @@ export const getUserBookings = async (req, res) => {
   try {
     const userId = req.user.id;
 
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 5; // 5 per page
+    const skip = (page - 1) * limit;
+
+    const total = await Booking.countDocuments({ user: userId });
+
     const bookings = await Booking.find({ user: userId })
       .populate("venue", "name address city")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    res.status(200).json({ bookings });
+    res.status(200).json({
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      bookings,
+    });
 
   } catch (error) {
     console.error("Get User Bookings Error:", error);
@@ -303,5 +318,22 @@ export const getAvailableSlots = async (req, res) => {
     res.status(500).json({
       message: "Server error",
     });
+  }
+};
+
+
+export const getBookingById = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    res.status(200).json({ booking });
+
+  } catch (error) {
+    console.error("Get Booking Error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
