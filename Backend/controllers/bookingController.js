@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Booking from "../model/BookingModel.js";
 import Venue from "../model/VenueModel.js";
 import { generateSlots } from "../services/slotService.js";
+import razorpay from "../services/razorpayService.js"
 
 /* ======================================================
    CREATE BOOKING 
@@ -187,15 +188,21 @@ export const getUserBookings = async (req, res) => {
     const userId = req.user.id;
 
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 5; // 5 per page
-    const skip = (page - 1) * limit;
+    const limit = Number(req.query.limit) || 3;
+    const status = req.query.status; // 🔥 NEW
 
-    const total = await Booking.countDocuments({ user: userId });
+    const query = { user: userId };
 
-    const bookings = await Booking.find({ user: userId })
+    if (status) {
+      query.status = status; // confirmed / cancelled
+    }
+
+    const total = await Booking.countDocuments(query);
+
+    const bookings = await Booking.find(query)
       .populate("venue", "name address city")
       .sort({ createdAt: -1 })
-      .skip(skip)
+      .skip((page - 1) * limit)
       .limit(limit);
 
     res.status(200).json({
@@ -213,7 +220,7 @@ export const getUserBookings = async (req, res) => {
 
 
 /* ======================================================
-   CANCEL BOOKING
+   CANCEL BOOKING + REFUND
 ====================================================== */
 export const cancelBooking = async (req, res) => {
   try {
@@ -238,11 +245,22 @@ export const cancelBooking = async (req, res) => {
       });
     }
 
+    /* ================= REFUND ================= */
+
+    if (booking.paymentId) {
+      await razorpay.payments.refund(booking.paymentId, {
+        amount: booking.amount * 100, // in paise
+      });
+    }
+
+    /* ================= UPDATE STATUS ================= */
     booking.status = "cancelled";
+    booking.paymentStatus = "refunded";
+
     await booking.save();
 
     res.status(200).json({
-      message: "Booking cancelled successfully",
+      message: "Booking cancelled & refund initiated",
     });
 
   } catch (error) {
