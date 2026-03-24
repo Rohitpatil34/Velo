@@ -12,3 +12,15 @@ The platform provides real-time slot availability, secure authentication, and on
 - JWT-based authentication
 
 - Protected routes for authenticated users
+
+ 🏟 Venue Browsing
+  
+- Explore different sports venues
+- View venue details such as:
+  - Location
+  
+  - Sports available
+  
+  - Pricing
+  
+  - Available slots
