@@ -24,3 +24,11 @@ The platform provides real-time slot availability, secure authentication, and on
   - Pricing
   
   - Available slots
+
+    
+📅 Slot Booking System
+
+- Select preferred date and time slot
+  
+- Prevent double booking of the same slot
+- Store booking details in the database
