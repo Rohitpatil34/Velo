@@ -32,3 +32,8 @@ The platform provides real-time slot availability, secure authentication, and on
   
 - Prevent double booking of the same slot
 - Store booking details in the database
+
+💳 Payment Integration
+
+- Razorpay payment gateway
+- Secure transaction handling
