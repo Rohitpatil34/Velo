@@ -38,3 +38,8 @@ The platform provides real-time slot availability, secure authentication, and on
 - Razorpay payment gateway
 - Secure transaction handling
 - Payment verification on the backend
+
+📊 Booking Management
+- View booking history
+- Track booking status
+- Manage reservations
