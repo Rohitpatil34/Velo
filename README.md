@@ -43,3 +43,12 @@ The platform provides real-time slot availability, secure authentication, and on
 - View booking history
 - Track booking status
 - Manage reservations
+
+🛠 Tech Stack
+| Layer           | Technology                      |
+| --------------- | ------------------------------- |
+| Frontend        | React.js, HTML, CSS, JavaScript |
+| Backend         | Node.js, Express.js             |
+| Database        | MongoDB                         |
+| Authentication  | JWT (JSON Web Token)            |
+| Payment Gateway | Razorpay                        |
