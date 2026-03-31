@@ -52,3 +52,12 @@ The platform provides real-time slot availability, secure authentication, and on
 | Database        | MongoDB                         |
 | Authentication  | JWT (JSON Web Token)            |
 | Payment Gateway | Razorpay                        |
+
+
+⚙️ Installation & Setup
+
+1️⃣ Clone the Repository
+
+git clone : https://github.com/your-username/velo.git
+
+cd velo
