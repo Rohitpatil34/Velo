@@ -61,3 +61,11 @@ The platform provides real-time slot availability, secure authentication, and on
 git clone : https://github.com/your-username/velo.git
 
 cd velo
+
+2️⃣ Install Dependencies
+
+Backend
+
+cd server
+
+npm install
