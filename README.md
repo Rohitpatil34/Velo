@@ -47,7 +47,7 @@ The platform provides real-time slot availability, secure authentication, and on
 🛠 Tech Stack
 | Layer           | Technology                      |
 | --------------- | ------------------------------- |
-| Frontend        | React.js, HTML, CSS, JavaScript |
+| Frontend        | React.js, HTML,Tailwind CSS, JavaScript |
 | Backend         | Node.js, Express.js             |
 | Database        | MongoDB                         |
 | Authentication  | JWT (JSON Web Token)            |
